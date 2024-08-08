@@ -1,11 +1,9 @@
 # abmClient-java.coder
 
-Entitie: Cree las entidades para transformar en una tabla de bases de datos. 
-*Las relaciones @One To Many para client a Product.
-*Las relaciones @One to Many para client a Invoice. 
-*Las relaciones @One to Many para Product a InvoiceDetail. 
-*Las relaciones @One to Many para Invoice a InvoiceDetail. 
-*Las relaciones @Many to One para Product a Client
+Entities: Cree las entidades para transformar en una tabla de bases de datos. 
+*Las relaciones @One To Many para client a Invoice.
+*Las relaciones @One to Many para client a Cart. 
+*Las relaciones @One to Many para Invoice a Cart. 
 *Las relaciones @Many to One para Invoice a Client.
 *Las relaciones @Many to One para InvoiceDetail a Product.
 *Las relaciones @Many to One para InvoiceDetail a Invoice.
