@@ -3,6 +3,7 @@ package com.commerce.abm.controllers;
 import com.commerce.abm.entities.Product;
 import com.commerce.abm.services.ClientService;
 import com.commerce.abm.services.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping(path = "api/v1/products")
+@Tag( name ="Ruts of Products", description = "CRUD of products ")
 public class ProductController {
 
     @Autowired
@@ -23,7 +26,7 @@ public class ProductController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
         try {
             return new ResponseEntity<>(productService.save(product), HttpStatus.CREATED);
         } catch (Exception e) {
@@ -33,11 +36,11 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<Product>> readAllProducts() {
         try {
-            List<Product> products = productService.findAll();
-            if (!products.isEmpty()) {
-                return ResponseEntity.ok(products);
+            List<Product> allProducts = productService.findAll();
+            if (!allProducts.isEmpty()) {
+                return ResponseEntity.ok(allProducts);
             } else {
                 return ResponseEntity.noContent().build();
             }
@@ -47,8 +50,8 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getProductById(@PathVariable Long id) {
+    @GetMapping("api/v1/products/:pid")
+    public ResponseEntity<Object> readProductById(@PathVariable Long id) {
         try {
             Optional<Product> product = productService.findByID(id);
             if (product.isPresent()) {

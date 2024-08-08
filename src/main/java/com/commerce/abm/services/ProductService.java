@@ -1,22 +1,31 @@
 package com.commerce.abm.services;
 
+import com.commerce.abm.entities.Cart;
 import com.commerce.abm.entities.Client;
 import com.commerce.abm.entities.Product;
+import com.commerce.abm.repositories.CartRepository;
 import com.commerce.abm.repositories.ClientsRepository;
 import com.commerce.abm.repositories.ProductsRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductService {
 
+
+    @Autowired private ProductsRepository productsRepository;
     @Autowired private ClientsRepository clientsRepository;
-    @Autowired   private  ProductsRepository productsRepository;
+    @Autowired private CartRepository cartRepository;
+
+
+    public Product save (Product product){
+        return productsRepository.save(product);
+    }
 
     public List<Product> findAll() {
         return productsRepository.findAll();
@@ -26,36 +35,45 @@ public class ProductService {
         return  productsRepository.findById(id);
     }
 
-    public Product save (Product product){
-        return productsRepository.save(product);
-    }
 
     public void deleteById(Long id ) {
         productsRepository.deleteById(id);
     }
 
     public Product buyProduct(Long productId, Long clientId) throws Exception {
-        Optional<Product> product = productsRepository.findById(productId);
-        if (!product.isPresent()) {
+        // Buscar el producto por ID
+        Optional<Product> productOptional = productsRepository.findById(productId);
+        if (!productOptional.isPresent()) {
             throw new Exception("Product not found with id " + productId);
         }
-
-        Optional<Client> client = clientsRepository.findById(clientId);
-        if (!client.isPresent()) {
+        // Buscar el cliente por ID
+        Optional<Client> clientOptional = clientsRepository.findById(clientId);
+        if (!clientOptional.isPresent()) {
             throw new Exception("Client not found with id: " + clientId);
         }
 
-        Product foundProduct = product.get();
-        Client foundClient = client.get();
+        Product foundProduct = productOptional.get();
+        Client foundClient = clientOptional.get();
 
-        foundProduct.setClient(foundClient); //asigna el cliente encontrado
+        // Buscar el carrito del cliente o crear uno nuevo si no existe
+        Cart cart = cartRepository.findById(clientId)
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setClient(foundClient);
+                    newCart.setPrice(0.0); // Establece un precio inicial o realiza el ajuste según tu lógica
+                    newCart.setAmount(0); // Establece una cantidad inicial o realiza el ajuste según tu lógica
+                    newCart.setDelivered(false); // Establece un estado inicial si es necesario
+                    return cartRepository.save(newCart);
+                });
 
-        // Guarda el producto actualizado con el cliente asignado
+        // Asignar el carrito al producto
+        foundProduct.setCart(cart);
+
+        // Guardar el producto actualizado con el carrito asignado
         productsRepository.save(foundProduct);
 
         return foundProduct;
     }
-
 
     public Product update(Long id, Product updatedProduct) {
         Optional<Product> existingProduct = productsRepository.findById(id);
@@ -67,5 +85,7 @@ public class ProductService {
             throw new EntityNotFoundException("Producto no encontrado con ID: " + id);
         }
     }
+
+
 
 }

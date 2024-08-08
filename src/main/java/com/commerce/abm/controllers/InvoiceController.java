@@ -2,23 +2,25 @@ package com.commerce.abm.controllers;
 
 import com.commerce.abm.entities.Client;
 import com.commerce.abm.entities.Invoice;
-import com.commerce.abm.entities.InvoiceDetail;
+import com.commerce.abm.entities.Cart;
 import com.commerce.abm.services.ClientService;
-import com.commerce.abm.services.InvoiceDService;
+import com.commerce.abm.services.CartService;
 import com.commerce.abm.services.InvoiceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/v1/invoices")
+@Tag(name = "Routes of Invoice", description = "CRUD of invoices")
 public class InvoiceController {
+
 
     @Autowired
     private InvoiceService invoiceService;
@@ -26,56 +28,33 @@ public class InvoiceController {
     @Autowired
     private ClientService clientService;
 
-    @Autowired
-    private InvoiceDService invoiceDetailService;
+    @PostMapping("/{clid}")
+    public Invoice generateInvoice(@PathVariable("clid") Long clientId) {
+        return invoiceService.generateInvoice(clientId);
+    }
+
 
     @PostMapping
-    public ResponseEntity<Invoice> createInvoice(
-            @RequestParam Long clientId,
-            @RequestBody List<InvoiceDetail> invoiceDetails) {
+    public ResponseEntity<Invoice> createInvoice(@RequestParam Long clientId) {
         try {
-            // Obtener el cliente por su ID
-            Optional<Client> optionalClient = clientService.getOneClient(clientId);
-            if (!optionalClient.isPresent()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            // Crear la factura
-            Invoice invoice = new Invoice();
-            invoice.setClient(optionalClient.get());
-            invoice.setCreatedDate(LocalDate.now());
-
-            double total = invoiceDetails.stream()
-                    .mapToDouble(detail -> detail.getOwner().getPrice() * detail.getQuantity())
-                    .sum();
-            invoice.setTotal(total);
-
-            invoice.setInvoiceDetails(invoiceDetails);
-
-            // Guardar la factura en la base de datos
-            invoice = invoiceService.saveInvoice(invoice);
-
-            return new ResponseEntity<>(invoice, HttpStatus.CREATED);
+            Invoice invoice = invoiceService.generateInvoice(clientId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(invoice);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping("/{clientId}")
-    public ResponseEntity<List<Invoice>> getInvoicesByClient(@PathVariable Long clientId) {
+    @GetMapping("/{clid}")
+    public ResponseEntity<Invoice> getInvoiceByClientId(@PathVariable Long clientId) {
         try {
-            List<Invoice> invoices = invoiceService.getInvoicesByClientId(clientId);
-            if (!invoices.isEmpty()) {
-                return ResponseEntity.ok(invoices);
-            } else {
-                return ResponseEntity.noContent().build();
-            }
+            Invoice invoice = invoiceService.getInvoiceByClientId(clientId);
+            return ResponseEntity.ok(invoice);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
-            System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 }
