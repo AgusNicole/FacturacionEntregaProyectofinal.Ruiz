@@ -28,7 +28,7 @@ public class InvoiceService {
 public Invoice generateInvoice(Long clientId){
     Optional<Client> client = clientsRepository.findById(clientId);
     if(client.isPresent()){
-        List<Cart> carts = cartRepository.findByClientAndDelivered(clientId, false);
+        List<Cart> carts = cartRepository.findByClientIdAndDelivered(clientId, false);
         if(carts.isEmpty()){
             throw new RuntimeException("Not found products on cart");
         }else {

@@ -36,11 +36,11 @@ public class ClientController {
     private InvoiceService invoiceService;
 
 
-    @Operation(summary = "Get clients", description = "update client profile ")
-    @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = @Content(mediaType = "application/json"))
+    @Operation(summary = "create Client", description = "Registers a new client in the system. The request body should contain the client's details.")
+    @ApiResponse(responseCode = "201", description = "Client created successfully", content = @Content(mediaType = "application/json"))
     @ApiResponse(responseCode = "204", description = "No content")
+    @ApiResponse( responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields." )
     @ApiResponse(responseCode = "500", description = "Internal server error")
-
     @PostMapping("/register")
     public ResponseEntity<Client> createClient(@RequestBody Client client) {
         try {
@@ -52,6 +52,12 @@ public class ClientController {
         }
     }
 
+
+    @Operation(summary = "Get Client by ID ", description = "Retrieves a client by their unique identifier. Returns the client details if found.")
+    @ApiResponse(responseCode = "200", description = "Client retrieved successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client.")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getClientById(@PathVariable Long id){
         try {
@@ -67,8 +73,11 @@ public class ClientController {
         }
     }
 
-
-
+    @Operation(summary = "update client", description = "actualice client ")
+    @ApiResponse(responseCode = "200", description = "Client updated successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     @PatchMapping ("/{me}")
     public  ResponseEntity<Client> updateClient (@PathVariable Long id, @RequestBody Client data ) {
         try {
@@ -89,7 +98,11 @@ public class ClientController {
     }
 
 
-
+    @Operation(summary = "Delete Client", description = "Deletes a client by their unique identifier. If the client is successfully deleted, a confirmation response is returned.")
+    @ApiResponse(responseCode = "204", description = "Client deleted successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteClient (@PathVariable Long id) {
         try {

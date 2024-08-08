@@ -54,7 +54,7 @@ public class CartController {
         }
     }
 
-    @Operation(summary = "Get products in cart", description = "Retrieves all products in the client's cart that are not delivered")
+    @Operation(summary = "Read products in cart", description = "Retrieves all products in the client's cart that are not delivered")
     @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = @Content(mediaType = "application/json"))
     @ApiResponse(responseCode = "204", description = "No content")
     @ApiResponse(responseCode = "500", description = "Internal server error")

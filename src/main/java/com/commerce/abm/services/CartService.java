@@ -62,7 +62,7 @@ public class CartService {
 
 
     public List<Cart> findByClientAndDelivered(Long clientId) {
-     List<Cart>carts =cartRepository.findByClientAndDelivered(clientId, false);
+     List<Cart>carts =cartRepository.findByClientIdAndDelivered(clientId, false);
      if (carts.isEmpty()){
          throw new RuntimeException("Cart not found");
      } else {
