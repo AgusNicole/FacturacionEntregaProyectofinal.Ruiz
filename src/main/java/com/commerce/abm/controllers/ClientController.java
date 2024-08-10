@@ -18,11 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
-@RequestMapping(path= "api/v1/clientes")
+@RequestMapping(path= "api/v1/auth")
 @Tag(name = "Routes of Client", description = "CRUD of clients")
 public class ClientController {
 
@@ -36,67 +37,47 @@ public class ClientController {
     private InvoiceService invoiceService;
 
 
-    @Operation(summary = "create Client", description = "Registers a new client in the system. The request body should contain the client's details.")
+    @Operation(summary = "Create Client", description = "Registers a new client in the system. The request body should contain the client's details.")
     @ApiResponse(responseCode = "201", description = "Client created successfully", content = @Content(mediaType = "application/json"))
-    @ApiResponse(responseCode = "204", description = "No content")
-    @ApiResponse( responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields." )
+    @ApiResponse(responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields.")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @PostMapping("/register")
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
+    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) {
         try {
             return new ResponseEntity<>(clientService.saveClient(client), HttpStatus.CREATED);
-
         } catch (Exception e) {
-            System.out.println(e);
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
 
-    @Operation(summary = "Get Client by ID ", description = "Retrieves a client by their unique identifier. Returns the client details if found.")
-    @ApiResponse(responseCode = "200", description = "Client retrieved successfully.", content = @Content(mediaType = "application/json"))
-    @ApiResponse(responseCode = "400", description = "Bad Request")
-    @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client.")
-    @ApiResponse(responseCode = "500", description = "Internal server error")
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getClientById(@PathVariable Long id){
-        try {
-            Optional<Client> client = clientService.getOneClient(id);
-            if(client.isPresent()) {
-                return ResponseEntity.ok(client.get());
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e){
-            System.out.println(e);
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
-    @Operation(summary = "update client", description = "actualice client ")
+
+    @Operation(summary = "Update Client", description = "Update an existing client's details.")
     @ApiResponse(responseCode = "200", description = "Client updated successfully.", content = @Content(mediaType = "application/json"))
-    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields.")
     @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    @PatchMapping ("/{me}")
-    public  ResponseEntity<Client> updateClient (@PathVariable Long id, @RequestBody Client data ) {
+    @PutMapping("/api/v1/auth/me/{clid}")
+    public ResponseEntity<Client> updateClient(@PathVariable Long clid, @RequestBody Client data) {
         try {
-            Optional<Client> optionalClient = clientService.getOneClient(id);
-            if(optionalClient.isPresent()) {
+            Optional<Client> optionalClient = clientService.getOneClient(clid);
+            if (optionalClient.isPresent()) {
                 Client client = optionalClient.get();
                 client.setName(data.getName());
                 client.setLastname(data.getLastname());
                 client.setDocnumber(data.getDocnumber());
-                client.setInvoices(client.getInvoices());
+                client.setInvoices(data.getInvoices());
+                client.setCarts(data.getCarts());
                 return ResponseEntity.ok(clientService.saveClient(client));
-            }else {
-                return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
             System.out.println(e);
-        } return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
 
     @Operation(summary = "Delete Client", description = "Deletes a client by their unique identifier. If the client is successfully deleted, a confirmation response is returned.")
     @ApiResponse(responseCode = "204", description = "Client deleted successfully.", content = @Content(mediaType = "application/json"))
@@ -104,18 +85,12 @@ public class ClientController {
     @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteClient (@PathVariable Long id) {
+    public void deleteClient (@PathVariable ("id") Long id) {
         try {
-            Optional<Client> optionalClient = clientService.getOneClient(id);
-            if (optionalClient.isPresent()) {
-                clientService.deleteOneClient(id);
-                return ResponseEntity.ok().build();
-            }else {
-                return ResponseEntity.notFound().build(); }
-
+         clientService.deleteOneClient(id);
         } catch (Exception e) {
             System.out.println(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+           throw new RuntimeException("DELETE ONE ERROR");
         }
     }
 

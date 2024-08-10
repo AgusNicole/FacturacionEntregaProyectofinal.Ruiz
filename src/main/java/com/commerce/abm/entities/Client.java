@@ -1,6 +1,7 @@
 package com.commerce.abm.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -22,13 +23,13 @@ public class Client {
     @Getter @Setter
     private Long id;
 
-    @NotNull(message = "Name cannot be null")
+    @NotBlank(message = "Name is mandatory")
     @Getter @Setter private String name;
 
-    @NotNull(message = "lastname cannot be null")
+    @NotBlank(message = "Lastname is mandatory")
     @Getter @Setter private String lastname;
 
-    @NotNull(message = "docnumber cannot be null")
+    @NotBlank(message = "Document number is mandatory")
     @Getter @Setter  private Integer docnumber;
 
 

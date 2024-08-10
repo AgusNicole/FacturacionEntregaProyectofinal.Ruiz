@@ -3,6 +3,9 @@ package com.commerce.abm.controllers;
 import com.commerce.abm.entities.Product;
 import com.commerce.abm.services.ClientService;
 import com.commerce.abm.services.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,11 @@ public class ProductController {
     @Autowired
     private ClientService clientService;
 
+
+    @Operation(summary = "Create Product", description = "Registers a new product in the system. The request body should contain the product's details.")
+    @ApiResponse(responseCode = "201", description = "Product created successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields.")
+    @ApiResponse(responseCode = "500", description = "Internal server error. An unexpected error occurred while processing the request.")
     @PostMapping
     public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
         try {
@@ -35,6 +43,10 @@ public class ProductController {
         }
     }
 
+    @Operation(summary = "Get All Products", description = "Retrieves a list of all products in the system.")
+    @ApiResponse(responseCode = "200", description = "Products retrieved successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "204", description = "No Content. No products found in the system.")
+    @ApiResponse(responseCode = "500", description = "Internal server error. An unexpected error occurred while processing the request.")
     @GetMapping
     public ResponseEntity<List<Product>> readAllProducts() {
         try {
@@ -50,6 +62,11 @@ public class ProductController {
         }
     }
 
+    @Operation(summary = "Get Product by ID", description = "Retrieves a product by its unique identifier. Returns the product details if found.")
+    @ApiResponse(responseCode = "200", description = "Product retrieved successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request. The provided ID is invalid.")
+    @ApiResponse(responseCode = "404", description = "Product not found. The ID provided does not match any existing product.")
+    @ApiResponse(responseCode = "500", description = "Internal server error. An unexpected error occurred while processing the request.")
     @GetMapping("api/v1/products/:pid")
     public ResponseEntity<Object> readProductById(@PathVariable Long id) {
         try {
@@ -65,6 +82,12 @@ public class ProductController {
         }
     }
 
+
+    @Operation(summary = "Update Product", description = "Updates an existing product's details by its unique identifier.")
+    @ApiResponse(responseCode = "200", description = "Product updated successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "Bad Request. The provided ID or request body is invalid.")
+    @ApiResponse(responseCode = "404", description = "Product not found. The ID provided does not match any existing product.")
+    @ApiResponse(responseCode = "500", description = "Internal server error. An unexpected error occurred while processing the request.")
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
         try {
