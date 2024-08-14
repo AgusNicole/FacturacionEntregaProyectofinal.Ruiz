@@ -8,7 +8,7 @@ Repositorios: Interfaces que extienden de otra clase (Jpa Repository)
 
 Servicios: Donde se necesita "inyectar" una dependencia en privado,  de los repositories con @Autowired e implementar la logica. 
 
-Controllers: Clases que conecta los servicios y genera mapeo de datos. Utilizando decoradores para definir las rutas  @PostMapping, @GetMapping, @DeleteMapping, @PatchMapping.. 
+Controllers: Clases que conecta los servicios y genera mapeo de datos. Utilizando decoradores para definir las rutas  @PostMapping, @GetMapping, @DeleteMapping, @PutMapping.. 
 
 Rutas: 
 ProductController:
