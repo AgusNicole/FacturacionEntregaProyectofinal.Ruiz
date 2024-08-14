@@ -1,6 +1,8 @@
 package com.commerce.abm.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,10 +23,9 @@ public class Product {
     @Getter @Setter private Integer stock;
     @Getter @Setter private Double price;
 
-    @ManyToOne
-    @JoinColumn(name = "cart") // Asegúrate de que la columna `cart_id` exista en la tabla `products`
-    @JsonIgnore
-    @Getter @Setter private Cart cart;
+   @OneToMany (mappedBy= "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @JsonManagedReference
+    private List<Cart> cart;
 }
 
 

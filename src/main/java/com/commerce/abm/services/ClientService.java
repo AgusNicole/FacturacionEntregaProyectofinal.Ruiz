@@ -30,12 +30,10 @@ public class ClientService {
         return cliente;
     }
 
-    public void deleteOneClient(Long id) {
-        clientsRepository.deleteById(id);
+
+    public List<Client> findAllClients() {
+        return clientsRepository.findAll();
     }
-
-
-
 
 
 }

@@ -31,22 +31,20 @@ public class ProductService {
         return productsRepository.findAll();
     }
 
-    public  Optional<Product> findByID(Long id){
-        return  productsRepository.findById(id);
-    }
 
+  public Optional<Product> getOneProduct(Long id){
+      return productsRepository.findById(id);
+   }
 
-    public void deleteById(Long id ) {
+    public void deleteById(Long id) {
         productsRepository.deleteById(id);
     }
 
     public Product buyProduct(Long productId, Long clientId) throws Exception {
-        // Buscar el producto por ID
         Optional<Product> productOptional = productsRepository.findById(productId);
         if (!productOptional.isPresent()) {
             throw new Exception("Product not found with id " + productId);
         }
-        // Buscar el cliente por ID
         Optional<Client> clientOptional = clientsRepository.findById(clientId);
         if (!clientOptional.isPresent()) {
             throw new Exception("Client not found with id: " + clientId);
@@ -54,37 +52,43 @@ public class ProductService {
 
         Product foundProduct = productOptional.get();
         Client foundClient = clientOptional.get();
-
         // Buscar el carrito del cliente o crear uno nuevo si no existe
-        Cart cart = cartRepository.findById(clientId)
+        List<Cart> clientCarts = cartRepository.findByClientId(foundClient.getId());
+        Cart cart = clientCarts.stream()
+                .filter(c -> !c.isDelivered())
+                .findFirst()
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setClient(foundClient);
-                    newCart.setPrice(0.0); // Establece un precio inicial o realiza el ajuste según tu lógica
-                    newCart.setAmount(0); // Establece una cantidad inicial o realiza el ajuste según tu lógica
-                    newCart.setDelivered(false); // Establece un estado inicial si es necesario
+                    newCart.setPrice(0.0); // Ajusta el precio según tu lógica
+                    newCart.setAmount(0); // Ajusta la cantidad según tu lógica
+                    newCart.setDelivered(false);
                     return cartRepository.save(newCart);
                 });
 
-        // Asignar el carrito al producto
-        foundProduct.setCart(cart);
+        // Agregar el producto al carrito
+        cart.setProduct(foundProduct);
+        cart.setAmount(cart.getAmount() + 1); // Incrementa la cantidad o ajusta según la lógica
+        cart.setPrice(cart.getPrice() + foundProduct.getPrice()); // Ajusta el precio del carrito
 
-        // Guardar el producto actualizado con el carrito asignado
-        productsRepository.save(foundProduct);
+        // Guardar el carrito actualizado
+        cartRepository.save(cart);
 
         return foundProduct;
     }
 
+
     public Product update(Long id, Product updatedProduct) {
         Optional<Product> existingProduct = productsRepository.findById(id);
-
         if (existingProduct.isPresent()) {
-            updatedProduct.setId(id); // Asegura que el ID del producto a actualizar sea el correcto
+            updatedProduct.setId(id);
             return productsRepository.save(updatedProduct);
         } else {
-            throw new EntityNotFoundException("Producto no encontrado con ID: " + id);
+            throw new EntityNotFoundException("Product not found: " + id);
         }
     }
+
+
 
 
 

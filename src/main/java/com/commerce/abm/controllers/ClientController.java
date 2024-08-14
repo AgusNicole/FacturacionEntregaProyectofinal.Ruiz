@@ -9,9 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 @CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
@@ -58,10 +55,10 @@ public class ClientController {
     @ApiResponse(responseCode = "400", description = "Bad Request. The request body is invalid or missing required fields.")
     @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    @PutMapping("/api/v1/auth/me/{clid}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long clid, @RequestBody Client data) {
+    @PutMapping("/me/{id}")
+    public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client data) {
         try {
-            Optional<Client> optionalClient = clientService.getOneClient(clid);
+            Optional<Client> optionalClient = clientService.getOneClient(id);
             if (optionalClient.isPresent()) {
                 Client client = optionalClient.get();
                 client.setName(data.getName());
@@ -79,25 +76,24 @@ public class ClientController {
         }
     }
 
-    @Operation(summary = "Delete Client", description = "Deletes a client by their unique identifier. If the client is successfully deleted, a confirmation response is returned.")
-    @ApiResponse(responseCode = "204", description = "Client deleted successfully.", content = @Content(mediaType = "application/json"))
-    @ApiResponse(responseCode = "400", description = "Bad Request")
-    @ApiResponse(responseCode = "404", description = "Client not found. The ID provided does not match any existing client")
+
+    @Operation(summary = "Get All Clients", description = "Retrieves a list of all clients in the system.")
+    @ApiResponse(responseCode = "200", description = "Clients retrieved successfully.", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "204", description = "No Content. No clients found in the system.")
     @ApiResponse(responseCode = "500", description = "Internal server error")
-    @DeleteMapping("/{id}")
-    public void deleteClient (@PathVariable ("id") Long id) {
+    @GetMapping("/clients")
+    public ResponseEntity<List<Client>> getAllClients() {
         try {
-         clientService.deleteOneClient(id);
+            List<Client> clients = clientService.findAllClients();
+            if (!clients.isEmpty()) {
+                return ResponseEntity.ok(clients);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
         } catch (Exception e) {
-            System.out.println(e);
-           throw new RuntimeException("DELETE ONE ERROR");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
-
-
-
 
 
 }

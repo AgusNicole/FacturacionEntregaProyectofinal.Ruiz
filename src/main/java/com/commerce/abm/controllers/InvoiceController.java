@@ -59,9 +59,9 @@ public class InvoiceController {
     @ApiResponse(responseCode = "404", description = "Invoice not found..")
     @ApiResponse(responseCode = "500", description = "Internal server error. An unexpected error occurred while processing the request.")
     @GetMapping("/{clid}")
-    public ResponseEntity<Invoice> getInvoiceByClientId(@PathVariable Long clientId) {
+    public ResponseEntity<Invoice> getInvoiceByClientId(@PathVariable Long clid) {
         try {
-            Invoice invoice = invoiceService.getInvoiceByClientId(clientId);
+            Invoice invoice = invoiceService.getInvoiceByClientId(clid);
             return ResponseEntity.ok(invoice);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

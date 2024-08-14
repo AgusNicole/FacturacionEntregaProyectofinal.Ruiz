@@ -1,6 +1,7 @@
 package com.commerce.abm.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,12 +17,13 @@ public class Invoice {
     @Getter @Setter private Date createdate;
     @Getter @Setter private Double total;
 
+
     @ManyToOne @JoinColumn (name= "client_id")
+    @JsonManagedReference
     @Getter @Setter private Client client;
 
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Getter @Setter private List <Cart> carts;
+
 
 
 }

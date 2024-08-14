@@ -1,9 +1,11 @@
 package com.commerce.abm.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity @Table
@@ -17,17 +19,17 @@ public class Cart {
 
 
     @ManyToOne
-    @JoinColumn(name = "client", nullable = false)
-    @JsonIgnore
+    @JoinColumn(name = "client_id", nullable = false)
+    @JsonBackReference// Evita la serialización cíclica hacia Client
     @Getter @Setter private Client client;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Getter @Setter
-    @JsonIgnore
-    private List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    @JsonBackReference
+   @Getter @Setter private Product product;
 
-
-    @ManyToOne @JoinColumn (name= "invoice_id")
-    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "invoice_id")
+    @JsonBackReference
     @Getter @Setter private Invoice invoice;
 }
