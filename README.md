@@ -3,8 +3,11 @@
 Proyecto e commerce  final de Coder, para administrar las ventas de un comercio.  
 Carpetas :
 Entities: Cree las entidades para transformar en una tabla de bases de datos: Client, Product, Cart, Invoice. 
-Repositorios: Interfaces que extienden de otra clase (Jpa Repository) 
+
+Repositorios: Interfaces que extienden de otra clase (Jpa Repository)
+
 Servicios: Donde se necesita "inyectar" una dependencia en privado,  de los repositories con @Autowired e implementar la logica. 
+
 Controllers: Clases que conecta los servicios y genera mapeo de datos. Utilizando decoradores para definir las rutas  @PostMapping, @GetMapping, @DeleteMapping, @PatchMapping.. 
 
 Rutas: 
