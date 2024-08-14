@@ -1,20 +1,13 @@
 # abmClient-java.coder
 
-Entities: Cree las entidades para transformar en una tabla de bases de datos. 
-*Las relaciones @One To Many para client a Invoice.
-*Las relaciones @One to Many para client a Cart. 
-*Las relaciones @One to Many para Invoice a Cart. 
-*Las relaciones @Many to One para Invoice a Client.
-*Las relaciones @Many to One para InvoiceDetail a Product.
-*Las relaciones @Many to One para InvoiceDetail a Invoice.
-
-
+Proyecto e commerce  final de Coder, para administrar las ventas de un comercio.  
+Carpetas :
+Entities: Cree las entidades para transformar en una tabla de bases de datos: Client, Product, Cart, Invoice. 
 Repositorios: Interfaces que extienden de otra clase (Jpa Repository) 
+Servicios: Donde se necesita "inyectar" una dependencia en privado,  de los repositories con @Autowired e implementar la logica. 
+Controllers: Clases que conecta los servicios y genera mapeo de datos. Utilizando decoradores para definir las rutas  @PostMapping, @GetMapping, @DeleteMapping, @PatchMapping.. 
 
-Servicios: Donde se necesita "inyectar" una dependencia en privado,  de los repositories con @Autowired. 
-
-Controllers: Clase que conecta los servicios y genera mapeo de datos. Utilizando decoradores para definir las rutas  @PostMapping, @GetMapping, @DeleteMapping, @PatchMapping.. 
-
+Rutas: 
 ProductController:
 POST /api/v1/products para crear un producto.
 GET /api/v1/products para leer productos.
@@ -26,8 +19,13 @@ POST /api/v1/auth/register para registrar (crear) un cliente.
 PUT /api/v1/auth/me para actualizar el perfil de un cliente.
 
 InvoiceController:
-OST /api/v1/invoices para generar el comprobante con el total a pagar por un cliente por sus productos en el carrito
-GET /api/v1/invoices/:cid para leer el comprobante del cliente
+POST /api/v1/invoices para generar el comprobante con el total a pagar por un cliente por sus productos en el carrito (no entregados), además cambia esa propiedad (delivered) de false a true.
+GET /api/v1/invoices/:cid para leer el comprobante del cliente.
 
-Aplicando en el Postman (Interfaz) : Post para crear , Get obtener, Delete borrar.  
-...Proximamente necesita nueva actualizacion.. 
+CartController:
+POST /api/v1/carts/:clid/:pid/:q para agregar un producto de un cliente al carrito (delivered en false)
+DELETE /api/v1/carts/:cid para quitar un producto de un cliente al carrito
+GET /api/v1/carts/:clid para leer los productos de un cliente al carrito (con delivered en false)
+
+
+
